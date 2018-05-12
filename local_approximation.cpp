@@ -153,7 +153,7 @@ namespace integration_approximation {
 
 double retrieve_element( vector<double>* result ){
     double first_element = (*result)[0];
-    (*result).erase(result->begin(), result->begin()+1);
+    (*result).erase(result->begin());
     return first_element;
 }
 
