@@ -76,4 +76,86 @@ namespace differentiation_approximation
 	}
 }
 
+namespace integration_approximation {
+    
+    void rectangle( void(*function)( double time, vector<double>*, vector<double>*),
+                   double time, double march, vector<double>* input, vector<double>* integration )
+    {
+        vector<double> result;
+        function(time, input, &result);
+        
+        double rect_integation = march*result[0];
+        
+        (*integration).push_back( rect_integation );
+    }
+    
+    void trapezoid(void(*function)( double time, vector<double>*, vector<double>*),
+                   double time, double march, vector<double>* input, vector<double>* integration )
+    {
+        vector<double> result_1, result_2;
+        function(time, input, &result_1);
+        function(time+march, input, &result_2);
+        
+        double trap_integation = march*0.5*(result_1[0] + result_2[0]);
+        
+        (*integration).push_back( trap_integation );
+        
+    }
+    
+    void midpoint(void(*function)( double time, vector<double>*, vector<double>*),
+                  double time, double march, vector<double>* input, vector<double>* integration )
+    {
+        vector<double> result;
+        double midpt = time + (march/2.0);
+        function(midpt, input, &result);
+        
+        double midpt_integation = march*result[0];
+        
+        (*integration).push_back( midpt_integation );
+    }
+    
+    void simpson(void(*function)( double time, vector<double>*, vector<double>*),
+                 double time, double march, vector<double>* input, vector<double>* integration )
+    {
+        double pt1 = time;
+        double pt2 = time + (march/2.0);
+        double pt3 = time + march;
+        
+        vector<double> result_1, result_2, result_3;
+        
+        function(pt1, input, &result_1);
+        function(pt2, input, &result_2);
+        function(pt3, input, &result_3);
+        
+        double simp_integation = march*(1.0/6.0)*(result_1[0] + 4.0*result_2[0] + result_3[0]);
+        
+        (*integration).push_back( simp_integation );
+    }
+    
+    
+    void gaus2pt(void(*function)( double time, vector<double>*, vector<double>*),
+                 double time, double march, vector<double>* input, vector<double>* integration )
+    {
+        double midpt = time + (march/2.0);
+        double pt1 = midpt - ((1.0/(2*sqrt(3)))*march);
+        double pt2 = midpt + ((1.0/(2*sqrt(3)))*march);
+        
+        vector<double> result_1, result_2;
+        
+        function(pt1, input, &result_1);
+        function(pt2, input, &result_2);
+        
+        double simp_integation = march*(0.5)*(result_1[0] + result_2[0]);
+        
+        (*integration).push_back( simp_integation );
+    }
+}
+
+double retrieve_element( vector<double>* result ){
+    double first_element = (*result)[0];
+    (*result).erase(result->begin(), result->begin()+1);
+    return first_element;
+}
+
+
 

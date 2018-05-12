@@ -39,7 +39,27 @@ namespace differentiation_approximation
     						  double time , double march , vector<double>* input , vector<double>* error );
     }
 
-}
+};
+
+namespace integration_approximation {
+    
+    void rectangle( void(*function)( double time, vector<double>*, vector<double>*),
+                   double time, double march, vector<double>* input, vector<double>* integration );
+    
+    void trapezoid(void(*function)( double time, vector<double>*, vector<double>*),
+                   double time, double march, vector<double>* input, vector<double>* integration );
+    
+    void midpoint(void(*function)( double time, vector<double>*, vector<double>*),
+                   double time, double march, vector<double>* input, vector<double>* integration );
+    
+    void simpson(void(*function)( double time, vector<double>*, vector<double>*),
+                  double time, double march, vector<double>* input, vector<double>* integration );
+    
+    void gaus2pt(void(*function)( double time, vector<double>*, vector<double>*),
+                 double time, double march, vector<double>* input, vector<double>* integration );
+};
+
+double retrieve_element( vector<double>* result );
 
 
 #endif /* local_approx_hpp */
