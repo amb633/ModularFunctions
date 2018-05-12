@@ -9,7 +9,8 @@ void generic_polynomial_function ( double time , vector<double>* input , vector<
 	(*result).push_back( answer );
 }
 
-namespace local_approximation {
+namespace differentiation_approximation 
+{
 
 	void forwardEuler( void (*function)(double , vector<double>* input, vector<double>* ) ,
 		double time , double march , vector<double>* input , vector<double>* gradient )
@@ -60,6 +61,18 @@ namespace local_approximation {
 
 		double sta = -(result_3[0]/(2.0*march)) - 3.0*(result_1[0]/(2.0*march)) + 2.0*result_2[0]/march;
 		(*gradient).push_back(sta);	
+	}
+
+	void error_calculation::richardsonEstimation( void (*function)(double , vector<double>* , vector<double>* ) ,
+		double time , double march , vector<double>* input , vector<double>* error )
+	{
+		vector<double> gradient;
+		differentiation_approximation::forwardEuler( function , time , march*4.0 , input , &gradient );
+		differentiation_approximation::forwardEuler( function , time , march*2.0 , input , &gradient );
+		differentiation_approximation::forwardEuler( function , time , march 	 , input , &gradient );
+
+		double err = ( gradient[0] - gradient[1] ) / ( gradient[1] - gradient[2] );
+		(*error).push_back( err );
 	}
 }
 
