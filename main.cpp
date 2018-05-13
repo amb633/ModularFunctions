@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "local_approximation.hpp"
+#include "utility_functions.hpp"
 
 int main(int argc, const char * argv[]) {
     cout<<fixed;

@@ -7,7 +7,7 @@
 
 #ifndef local_approx_hpp
 #define local_approx_hpp
-
+#pragma once
 #include <stdio.h>
 #include <cstdlib>
 #include <iostream>
