@@ -175,3 +175,10 @@ void vectorNorm( vector<double>* vector_1 , vector<double>* vector_2 , double& r
 	}
 	result = sqrt( squareSum );
 }
+
+void get_random( double min , double max , double& random_number )
+{
+	// generates random number in range (min, max);
+	double temp = (double)rand()/ RAND_MAX;
+	random_number = ( max - min ) * temp + min;
+}

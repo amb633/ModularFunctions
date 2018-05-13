@@ -9,6 +9,7 @@
 #include <iostream>
 #include "local_approximation.hpp"
 #include "utility_functions.hpp"
+#include "fullSolver.hpp"
 
 int main(int argc, const char * argv[]) {
     cout<<fixed;
@@ -42,6 +43,11 @@ int main(int argc, const char * argv[]) {
     cout << " midpoint integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
     cout << " simpson integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
     cout << " gaussian 2-pt integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-    
+
+    cout << endl << endl;
+
+    // test_direct_solver();
+
+       
     return 0;
 }

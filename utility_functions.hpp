@@ -26,3 +26,5 @@ void expVector( vector<double>* input , vector<double>* result);
 
 void vectorNorm( vector<double>* vector_1 , double& result );
 void vectorNorm( vector<double>* vector_1 , vector<double>* vector_2 , double& result );
+
+void get_random( double min , double max , double& random_number );
