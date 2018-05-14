@@ -2,11 +2,10 @@
 
 /* Local Approximation Analysis */
 
-
 void generic_polynomial_function ( double time , vector<double>* input , vector<double>* result )
 {
-	double answer = 7.0*pow(time,3.0) - 8.0*pow(time,2.0) - 3.0*time + 3.0;
-	(*result).push_back( answer );
+    double answer = 7.0*pow(time,3.0) - 8.0*pow(time,2.0) - 3.0*time + 3.0;
+    (*result).push_back( answer );
 }
 
 namespace differentiation_approximation 

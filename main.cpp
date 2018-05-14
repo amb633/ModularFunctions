@@ -10,6 +10,7 @@
 #include "local_approximation.hpp"
 #include "utility_functions.hpp"
 #include "fullSolver.hpp"
+#include "non_linear_solvers.hpp"
 
 int main(int argc, const char * argv[]) {
     cout<<fixed;
@@ -51,6 +52,13 @@ int main(int argc, const char * argv[]) {
     test_direct_solver();
 
     test_SOR_iter_solver();
+
+    cout << " testing recurrence relation function : " ; 
+    test_recurrence_relation();
+    cout << " testing secant gradient function : " ; 
+    test_secant_gradient();
+    cout << " testing secant hessian function : " << endl; 
+    test_secant_hessian();
        
     return 0;
 }
