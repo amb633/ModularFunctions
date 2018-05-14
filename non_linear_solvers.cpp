@@ -84,7 +84,7 @@ void secantMinimization::secant_delta( void (*function)( double , vector<double>
 		}
 
 		counter++;
-		if ( counter > 5000 ) break;
+		//if ( counter > 5000 ) break;
 	}
 
 	(*parameter_solutions) = initial_guess_3;

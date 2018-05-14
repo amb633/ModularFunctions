@@ -18,7 +18,7 @@ void exponential_function( double time , vector<double>* input , vector<double>*
 {
 	double x , temp;
 	x = (*input)[0];
-	temp = exp( 100.0*x ) - 1;
+	temp = exp( 100.0*x ) - 1.0;
 	(*output).push_back(temp);
 	return;
 }

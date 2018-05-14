@@ -16,6 +16,7 @@ int main(int argc, const char * argv[]) {
     cout<<fixed;
     
     void (*function)( double , vector<double>* , vector<double>* ) = generic_polynomial_function;
+    void (*exp_func)( double , vector<double>* , vector<double>* ) = exponential_function;
     
     vector<double> input , gradient , error;
     
@@ -59,6 +60,18 @@ int main(int argc, const char * argv[]) {
     test_secant_gradient();
     cout << " testing secant hessian function : " << endl; 
     test_secant_hessian();
-       
+
+    vector<double> initial_guess_1 , initial_guess_2 , parameter_solutions , perfomance_metrics;
+    initial_guess_1.push_back(1.1);
+    initial_guess_2.push_back(1.0);
+    secantMinimization::secant_delta( exp_func , 0.0 , initial_guess_1 , initial_guess_2 , 
+        &parameter_solutions , &perfomance_metrics );
+
+    cout << " testing secant delta function : " ; 
+    printVector( &parameter_solutions );
+    cout << " perfomance_metrics : " ;
+    printVector( &perfomance_metrics );
+
+
     return 0;
 }
