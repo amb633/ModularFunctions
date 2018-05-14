@@ -11,6 +11,7 @@
 #include "utility_functions.hpp"
 #include "fullSolver.hpp"
 #include "non_linear_solvers.hpp"
+#include "ode_solver.hpp"
 
 int main(int argc, const char * argv[]) {
     cout<<fixed;
@@ -101,6 +102,12 @@ int main(int argc, const char * argv[]) {
     printVector( &parameter_solutions_c );
     cout << " perfomance_metrics : " ;
     printVector( &perfomance_metrics_c );
+
+    cout << "--------------- TESTING ODE SOLVERS --------------- " << endl;
+    cout << "testing forward euler method : " << endl;
+    test_forward_euler();
+    cout << endl << "testing heun one step method : " << endl;
+    test_heun_oneStep();
 
     return 0;
 }
