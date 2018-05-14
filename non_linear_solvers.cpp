@@ -153,3 +153,104 @@ void secantMinimization::hessian_calculation( vector<double>* current_parameters
 	}
 	return;
 }
+
+void quasiNewtonMinimization::quasiNewton_delta( void (*function)( double , vector<double>* , vector<double>* ) ,
+	double time , vector<double> previous_parameters , double pert , 
+	vector<double>* parameter_solutions , vector<double>* performance_metrics , bool normalize )
+{
+
+	int counter = 0;
+	double relative_residual = 1.0 ;
+	double absolute_residual;
+	vector<double> updated_parameters;
+
+	while( relative_residual > 1e-9 ){
+
+		//printVector( &previous_parameters );
+		vector<double> previous_output , perturbed_output;
+		vector<double> perturbed_parameters;
+		vector<double> gradients , deltas;
+		vector<vector<double>> perturbed_output_cross , hessians;
+		zeroMatrix( previous_parameters.size() , &perturbed_output_cross );
+		function( time , &previous_parameters , &previous_output );
+
+		for ( int i = 0 ; i < previous_parameters.size() ; i++ ){
+			vector<double> param_dummy = previous_parameters;
+			param_dummy[i] = (1.0+pert)*param_dummy[i];
+			perturbed_parameters.push_back(param_dummy[i]);
+			function( time , &param_dummy , &perturbed_output );
+		}
+
+		for ( int i = 0 ; i < previous_parameters.size() ; i++ ){
+			for ( int j = 0 ; j < previous_parameters.size() ; j++ ){
+				vector<double> param_dummy = previous_parameters;
+				if ( i == j ) param_dummy[i] = (1.0 + 2.0*pert)*param_dummy[i];
+				else{
+					param_dummy[i] = (1.0 + pert)*param_dummy[i];
+					param_dummy[j] = (1.0 + pert)*param_dummy[j];
+				}
+				vector<double> temp;
+				function( time , &param_dummy , &temp );
+				perturbed_output_cross[i][j] = temp[0];
+				perturbed_output_cross[j][i] = temp[0];
+			}
+		}
+
+		gradient_calculation( &previous_parameters , pert , &previous_output , &perturbed_output , &gradients );
+		hessian_calculation( &previous_parameters , pert , &previous_output , &perturbed_output , &perturbed_output_cross, &hessians);
+		fullSolver( &hessians , &gradients , &deltas );
+
+		vector<double> deltas_n;
+		scaleVector( -1.0 , &deltas , &deltas_n );
+		addVectors( &previous_parameters , &deltas_n , &updated_parameters );
+
+		absolute_residual = 0.0;
+		relative_residual = 0.0;
+
+		for ( int i = 0 ; i < deltas.size() ; i++ ){
+			absolute_residual += deltas[i]*deltas[i];
+			relative_residual += (deltas[i]*deltas[i]) / (previous_parameters[i] * previous_parameters[i]);
+		}
+		previous_parameters.erase(previous_parameters.begin(), previous_parameters.end());
+		previous_parameters = updated_parameters;
+		updated_parameters.erase(updated_parameters.begin(), updated_parameters.end());
+		counter++;
+		if ( counter > 50000 ) break;
+	}	
+	(*parameter_solutions) = previous_parameters;
+	(*performance_metrics).push_back(counter);
+	(*performance_metrics).push_back(absolute_residual);
+	(*performance_metrics).push_back(relative_residual);
+	return;
+}
+
+void quasiNewtonMinimization::gradient_calculation( vector<double>* current_parameters , double pert ,
+	vector<double>* current_output , vector<double>* perturbed_output , vector<double>* gradients )
+{
+
+	for ( int i = 0 ; i < (*current_parameters).size() ; i++ ){
+		double num = (*perturbed_output)[i] - (*current_output)[0];
+		double den = pert*((*current_parameters)[i]);
+		double grad = num / den;
+		(*gradients).push_back(grad);
+	}
+	return;
+}
+
+void quasiNewtonMinimization::hessian_calculation( vector<double>* current_parameters , double pert , 
+	vector<double>* current_output , vector<double>* perturbed_output , vector<vector<double>>* perturbed_output_cross ,
+	vector<vector<double>>* hessians )
+{
+	int rank = (*current_parameters).size();
+	zeroMatrix( rank , hessians );
+	for ( int i = 0 ; i < rank ; i++ ){
+		for ( int j = 0 ; j < rank ; j++ ){
+			double num = (*perturbed_output_cross)[i][j] - (*perturbed_output)[i] - (*perturbed_output)[j] + (*current_output)[0];
+			double d1 = pert*((*current_parameters)[i]);
+			double d2 = pert*((*current_parameters)[j]);
+			double hess = num/ (d1 * d2);
+			(*hessians)[i][j] = hess;
+		}
+	}
+	return;
+}

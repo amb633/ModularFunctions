@@ -68,3 +68,64 @@ void test_secant_hessian()
 	printMatrix( &hessians );
 	return;
 }
+
+void test_quasiNewton_gradient()
+{
+	vector<double> guess_1 = {1.0 , 1.0};
+	double pert = 1e-3;
+	vector<double> output_1 , perturbed_parameters , perturbed_output , gradients;
+	generic_nonlinear_function( 0.0 , &guess_1 , &output_1 );
+
+	for ( int i = 0 ; i < guess_1.size() ; i++ ){
+		vector<double> param_dummy = guess_1;
+		param_dummy[i] = (1.0 + pert)*param_dummy[i];
+		perturbed_parameters.push_back( param_dummy[i] );
+		generic_nonlinear_function( 0.0 , &param_dummy , &perturbed_output );
+	}
+
+	quasiNewtonMinimization::gradient_calculation( &guess_1 , pert , &output_1 , &perturbed_output , &gradients );
+	printVector( &gradients );
+	return;
+}
+
+void test_quasiNewton_hessian()
+{
+	vector<double> guess_1 = {1.0 , 1.0};
+	double pert = 1e-3;
+	vector<double> output_1 , perturbed_parameters , perturbed_output , gradients;
+	generic_nonlinear_function( 0.0 , &guess_1 , &output_1 );
+
+	for ( int i = 0 ; i < guess_1.size() ; i++ ){
+		vector<double> param_dummy = guess_1;
+		param_dummy[i] = (1.0 + pert)*param_dummy[i];
+		perturbed_parameters.push_back( param_dummy[i] );
+		generic_nonlinear_function( 0.0 , &param_dummy , &perturbed_output );
+	}
+
+	vector<vector<double>> perturbed_output_cross;
+	vector<vector<double>> hessians;
+	zeroMatrix( guess_1.size() , &perturbed_output_cross );
+
+	for ( int i = 0 ; i < guess_1.size() ; i++ ){
+		for ( int j = 0 ; j < guess_1.size() ; j++ ){
+			vector<double> param_dummy = guess_1;
+			if ( i == j ){
+				param_dummy[i] = (1.0 + 2.0*pert)*param_dummy[i];
+			}
+			else {
+				param_dummy[i] = (1.0 + pert)*param_dummy[i];
+				param_dummy[j] = (1.0 + pert)*param_dummy[j];
+			}
+			vector<double> temp;
+			generic_nonlinear_function( 0.0 , &param_dummy , &temp );
+			perturbed_output_cross[i][j] = temp[0];
+			perturbed_output_cross[j][i] = temp[0];
+		}
+	}
+
+	quasiNewtonMinimization::hessian_calculation( &guess_1 , pert , &output_1 , &perturbed_output , 
+		&perturbed_output_cross , &hessians );
+	printMatrix( &hessians );
+	return;
+
+}

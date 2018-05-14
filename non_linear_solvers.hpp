@@ -22,8 +22,26 @@ namespace secantMinimization
 	vector<vector<double>>* hessians );
 }
 
+namespace quasiNewtonMinimization
+{
+	void quasiNewton_delta( void (*function)( double , vector<double>* , vector<double>* ) ,
+	double time , vector<double> initial_guess_1 , double pert , 
+	vector<double>* parameter_solutions , vector<double>* performance_metrics , bool normalize = 0);
+
+	void gradient_calculation( vector<double>* current_parameters , double pert ,
+	vector<double>* current_output , vector<double>*perturbed_output , vector<double>* gradients );
+
+	void hessian_calculation( vector<double>* current_parameters , double pert , 
+	vector<double>* current_output , vector<double>* perturbed_output , vector<vector<double>>* perturbed_output_cross ,
+	vector<vector<double>>* hessians );
+
+}
+
 void generic_nonlinear_function ( double time , vector<double>* input , vector<double>* output );
 void exponential_function( double time , vector<double>* input , vector<double>* output );
 void test_recurrence_relation();
 void test_secant_gradient();
 void test_secant_hessian();
+
+void test_quasiNewton_gradient();
+void test_quasiNewton_hessian();

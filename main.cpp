@@ -88,6 +88,18 @@ int main(int argc, const char * argv[]) {
     cout << " perfomance_metrics : " ;
     printVector( &perfomance_metrics_b );
 
+    cout << " testing quasiNewton gradient function : " ; 
+    test_quasiNewton_gradient();
+    cout << " testing quasiNewton hessian function : " << endl; 
+    test_quasiNewton_hessian();
+
+    vector<double> parameter_solutions_c , perfomance_metrics_c;
+
+    cout << " testing quasiNewton delta function : " ; 
+    quasiNewtonMinimization::quasiNewton_delta( nol_func , 0.0 , initial_guess_1b , 1e-3 , &parameter_solutions_c , &perfomance_metrics_c );
+    printVector( &parameter_solutions_c );
+    cout << " perfomance_metrics : " ;
+    printVector( &perfomance_metrics_c );
 
     return 0;
 }
