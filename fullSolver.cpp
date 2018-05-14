@@ -119,3 +119,101 @@ void backwardSubstitution( vector<vector<double>>* U , vector<double>* y , vecto
 	}
 
 }
+
+void get_diagInv( vector<vector<double>>* input, vector<double>* diag ){
+    for( int i=0; i<input->size(); i++){
+        for( int j=0; j< (*input)[0].size(); j++){
+            if( i == j){
+                (*diag).push_back(1.0/(*input)[i][j]);
+            }
+        }
+    }
+}
+
+/* decompose AF matrix into diagonal elements (stored in DF) and non-diagonal elements (stored in LUF) */
+void decomposeMatrix( vector<double>* DF , vector< vector<double>>* LUF , vector< vector<double>>* AF ){
+    
+    copyMatrix( AF, LUF );
+    
+    for ( int i = 0 ; i < (*AF).size() ; i++ ){
+        // extract the diagonal elements to DS
+        (*DF).push_back( retrieveElement( AF , i , i ) );
+        // change the diagonal elements in LUF to 0
+        changeElement( LUF , i , i , 0.0 );
+    }
+    
+    // negate all the elements in LUF
+    scaleMatrix( LUF , -1.0 );
+}
+
+void jacobiIter( vector<double>* X , vector<double>* DF , vector< vector<double>>* LUF , vector<double>* BF ){
+    
+    vector<double> matPdt;
+    vectorProduct( LUF, X, &matPdt);
+    
+    for ( int i = 0 ; i < (*DF).size() ; i++ ){
+        double dInv = 1.0/((*DF)[i]);
+        (*X)[i] = ((*BF)[i] + matPdt[i])*dInv;
+    }
+}
+
+void jacobiSolver( vector<vector<double>>* A, vector<double>* b, vector<double>* x, double tol ){
+    vector<double> D;
+    vector<vector<double>> L;
+    decomposeMatrix( &D , &L , A );
+    
+    double normPrev = 2;
+    double normCurrent = 1;
+    while ( abs(normCurrent - normPrev) > tol ) {
+        normPrev = normCurrent;
+        jacobiIter(x, &D, &L, b);
+        vector<double> Ax;
+        vectorProduct(A, x, &Ax);
+        vectorNorm(b, &Ax, normCurrent);
+    }
+}
+
+void SORIter( vector<vector<double>>* A, vector<double>* b, vector<double>* x, double omega){
+    
+    vector<double> r, product_Dr, product_Ax, neg_product_Ax, iter_adj;
+    vector<double> vector_dummy = *x;
+    
+    //calculating A*x_k-1
+    vectorProduct(A, x, &product_Ax);
+    
+    //solving for r_k-1
+    scaleVector(-1.0, &product_Ax, &neg_product_Ax);
+    addVectors(b, &neg_product_Ax, &r);
+    
+    vector<double> D_inv;
+    get_diagInv(A, &D_inv);
+    
+    //solving for iterative adjustment for x_k-1 w * D^-1 * r_k-1
+    vectorProduct(&D_inv, &r, &product_Dr);
+    scaleVector( omega, &product_Dr, &iter_adj);
+    
+    //solving for the current x_k
+    vectorSum(x, &iter_adj, x);
+    vector_dummy = *x;
+    
+}
+
+void SORSolver( vector<vector<double>>* A, vector<double>* b , vector<double>* x, double tol, double omega){
+
+    vector<double> x_SOR = *x;
+    double norm_SOR = 1.0;
+    size_t size = x_SOR.size();
+    
+    
+    while(norm_SOR > tol ){
+        
+        SORIter(A, b, &x_SOR, omega);
+        
+        //calculating the residual norm for (b - Ax_k)
+        vector<double> new_product_Ax;
+        vectorProduct(A, &x_SOR, &new_product_Ax);
+        vectorNorm(&new_product_Ax, b, norm_SOR);
+        
+    }
+
+}

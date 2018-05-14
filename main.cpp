@@ -46,8 +46,11 @@ int main(int argc, const char * argv[]) {
 
     cout << endl << endl;
 
-    // test_direct_solver();
+    test_jacobi_iter_solver();
+    
+    test_direct_solver();
 
+    test_SOR_iter_solver();
        
     return 0;
 }
