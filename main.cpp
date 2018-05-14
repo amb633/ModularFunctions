@@ -18,42 +18,42 @@ int main(int argc, const char * argv[]) {
     void (*function)( double , vector<double>* , vector<double>* ) = generic_polynomial_function;
     void (*exp_func)( double , vector<double>* , vector<double>* ) = exponential_function;
     void (*nol_func)( double , vector<double>* , vector<double>* ) = generic_nonlinear_function;
-    
+
     vector<double> input , gradient , error;
-    
-    differentiation_approximation::forwardEuler( function , 1.0 , 0.1 , &input , &gradient );
-    differentiation_approximation::backwardEuler( function , 1.0 , 0.1 , &input , &gradient );
-    differentiation_approximation::centralEuler( function , 1.0 , 0.1 , &input , &gradient );
-    differentiation_approximation::secondTaylor( function , 1.0 , 0.1 , &input , &gradient );
-    differentiation_approximation::error_calculation::richardsonEstimation( function , 1.0 , 0.1 , &input , &error );
-    
-    vector<double> integration;
-    integration_approximation::rectangle( function ,-1.0 , 2.0 , &input , &integration );
-    integration_approximation::trapezoid( function ,-1.0 , 2.0 , &input , &integration );
-    integration_approximation::midpoint( function ,-1.0 , 2.0 , &input , &integration );
-    integration_approximation::simpson( function ,-1.0 , 2.0 , &input , &integration );
-    integration_approximation::gaus2pt( function ,-1.0 , 2.0 , &input , &integration );
-    
-    cout << " forward gradient at 1.0 = " << gradient[0] << endl;
-    cout << " backward gradient at 1.0 = " << gradient[1] << endl;
-    cout << " central gradient at 1.0 = " << gradient[2] << endl;
-    cout << " 2nd order taylor grad at 1.0 = " << gradient[3] << endl;
-
-    cout << " richardson error estimation = " << error[0] << endl;
-    
-    cout << " rectangle integration from -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-    cout << " trapezoid integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-    cout << " midpoint integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-    cout << " simpson integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-    cout << " gaussian 2-pt integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
-
-    cout << endl << endl;
-
-    test_jacobi_iter_solver();
-    
-    test_direct_solver();
-
-    test_SOR_iter_solver();
+//
+//    differentiation_approximation::forwardEuler( function , 1.0 , 0.1 , &input , &gradient );
+//    differentiation_approximation::backwardEuler( function , 1.0 , 0.1 , &input , &gradient );
+//    differentiation_approximation::centralEuler( function , 1.0 , 0.1 , &input , &gradient );
+//    differentiation_approximation::secondTaylor( function , 1.0 , 0.1 , &input , &gradient );
+//    differentiation_approximation::error_calculation::richardsonEstimation( function , 1.0 , 0.1 , &input , &error );
+//
+//    vector<double> integration;
+//    integration_approximation::rectangle( function ,-1.0 , 2.0 , &input , &integration );
+//    integration_approximation::trapezoid( function ,-1.0 , 2.0 , &input , &integration );
+//    integration_approximation::midpoint( function ,-1.0 , 2.0 , &input , &integration );
+//    integration_approximation::simpson( function ,-1.0 , 2.0 , &input , &integration );
+//    integration_approximation::gaus2pt( function ,-1.0 , 2.0 , &input , &integration );
+//
+//    cout << " forward gradient at 1.0 = " << gradient[0] << endl;
+//    cout << " backward gradient at 1.0 = " << gradient[1] << endl;
+//    cout << " central gradient at 1.0 = " << gradient[2] << endl;
+//    cout << " 2nd order taylor grad at 1.0 = " << gradient[3] << endl;
+//
+//    cout << " richardson error estimation = " << error[0] << endl;
+//
+//    cout << " rectangle integration from -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
+//    cout << " trapezoid integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
+//    cout << " midpoint integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
+//    cout << " simpson integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
+//    cout << " gaussian 2-pt integration at -1.0 and 1.0 = " << retrieve_element(&integration) << endl;
+//
+//    cout << endl << endl;
+//
+//    test_jacobi_iter_solver();
+//
+//    test_direct_solver();
+//
+//    test_SOR_iter_solver();
 
     cout << " testing recurrence relation function : " ; 
     test_recurrence_relation();
@@ -95,8 +95,9 @@ int main(int argc, const char * argv[]) {
 
     vector<double> parameter_solutions_c , perfomance_metrics_c;
 
-    cout << " testing quasiNewton delta function : " ; 
-    quasiNewtonMinimization::quasiNewton_delta( nol_func , 0.0 , initial_guess_1b , 1e-3 , &parameter_solutions_c , &perfomance_metrics_c );
+    cout << " testing quasiNewton delta function : " ;
+    vector<double> expected_output = {0};
+    quasiNewtonMinimization::quasiNewton_delta( nol_func , 0.0 , initial_guess_1b , 1e-3 , &parameter_solutions_c , &perfomance_metrics_c , &expected_output);
     printVector( &parameter_solutions_c );
     cout << " perfomance_metrics : " ;
     printVector( &perfomance_metrics_c );

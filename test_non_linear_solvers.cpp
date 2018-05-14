@@ -119,7 +119,7 @@ void test_quasiNewton_hessian()
 			vector<double> temp;
 			generic_nonlinear_function( 0.0 , &param_dummy , &temp );
 			perturbed_output_cross[i][j] = temp[0];
-			perturbed_output_cross[j][i] = temp[0];
+//            perturbed_output_cross[j][i] = temp[0];
 		}
 	}
 

@@ -156,15 +156,15 @@ void secantMinimization::hessian_calculation( vector<double>* current_parameters
 
 void quasiNewtonMinimization::quasiNewton_delta( void (*function)( double , vector<double>* , vector<double>* ) ,
 	double time , vector<double> previous_parameters , double pert , 
-	vector<double>* parameter_solutions , vector<double>* performance_metrics , bool normalize )
+	vector<double>* parameter_solutions , vector<double>* performance_metrics , vector<double>* desired_result , bool normalize )
 {
 
 	int counter = 0;
 	double relative_residual = 1.0 ;
-	double absolute_residual;
+	double absolute_residual = 1.0;
 	vector<double> updated_parameters;
 
-	while( relative_residual > 1e-9 ){
+	while( absolute_residual > 1e-9 ){
 
 		//printVector( &previous_parameters );
 		vector<double> previous_output , perturbed_output;
@@ -202,15 +202,23 @@ void quasiNewtonMinimization::quasiNewton_delta( void (*function)( double , vect
 
 		vector<double> deltas_n;
 		scaleVector( -1.0 , &deltas , &deltas_n );
-		addVectors( &previous_parameters , &deltas_n , &updated_parameters );
+        vector<double> scaled_output, scaled_deltas;
+        tSearch(function, &deltas_n, &scaled_deltas, &previous_parameters, 0, 1, desired_result);
+		addVectors( &previous_parameters , &scaled_deltas , &updated_parameters );
 
 		absolute_residual = 0.0;
 		relative_residual = 0.0;
 
-		for ( int i = 0 ; i < deltas.size() ; i++ ){
-			absolute_residual += deltas[i]*deltas[i];
-			relative_residual += (deltas[i]*deltas[i]) / (previous_parameters[i] * previous_parameters[i]);
-		}
+//        for ( int i = 0 ; i < deltas.size() ; i++ ){
+//            absolute_residual += scaled_deltas[i]*scaled_deltas[i];
+//            relative_residual += (scaled_deltas[i]*scaled_deltas[i]) / (previous_parameters[i] * previous_parameters[i]);
+//        }
+        vectorNorm(&updated_parameters, &previous_parameters, relative_residual);
+        
+        vector<double> current_result;
+        function( time , &updated_parameters , &current_result );
+        vectorNorm(desired_result,&current_result, absolute_residual);
+        
 		previous_parameters.erase(previous_parameters.begin(), previous_parameters.end());
 		previous_parameters = updated_parameters;
 		updated_parameters.erase(updated_parameters.begin(), updated_parameters.end());
@@ -245,7 +253,7 @@ void quasiNewtonMinimization::hessian_calculation( vector<double>* current_param
 	zeroMatrix( rank , hessians );
 	for ( int i = 0 ; i < rank ; i++ ){
 		for ( int j = 0 ; j < rank ; j++ ){
-			double num = (*perturbed_output_cross)[i][j] - (*perturbed_output)[i] - (*perturbed_output)[j] + (*current_output)[0];
+			double num = (*perturbed_output_cross)[i][j] - (*perturbed_output)[i] - (*perturbed_output)[i] + (*current_output)[0];
 			double d1 = pert*((*current_parameters)[i]);
 			double d2 = pert*((*current_parameters)[j]);
 			double hess = num/ (d1 * d2);
@@ -253,4 +261,44 @@ void quasiNewtonMinimization::hessian_calculation( vector<double>* current_param
 		}
 	}
 	return;
+}
+
+void tSearch( void (*function)( double , vector<double>* , vector<double>* ), vector<double>* delta, vector<double>* t_delta, vector<double>* x, double t_min, double t_max, vector<double>* true_result){
+    
+    vector<double> t_opt_result;
+    vector<double> scaled_delta_mid, update_param_mid, result_mid;
+    vector<double> scaled_delta_min, update_param_min, result_min;
+    vector<double> scaled_delta_max, update_param_max, result_max;
+    
+    double t_mid = (t_max + t_min)/2;
+    
+    scaleVector(t_min, delta, &scaled_delta_min);
+    scaleVector(t_max, delta, &scaled_delta_max);
+    scaleVector(t_mid, delta, &scaled_delta_mid);
+    
+    addVectors(&scaled_delta_min, x, &update_param_min);
+    addVectors(&scaled_delta_max, x, &update_param_max);
+    addVectors(&scaled_delta_mid, x, &update_param_mid);
+    
+    double time = 0; //dummy not needed for this function;
+    function( time, &update_param_min, &result_min);
+    function( time, &update_param_max, &result_max);
+    function( time, &update_param_mid, &result_mid);
+    
+    double min_result, max_result, mid_result, opt_result;
+    vectorNorm(&result_min, true_result, min_result);
+    vectorNorm(&result_max, true_result, max_result);
+    vectorNorm(&result_mid, true_result, mid_result);
+    (*t_delta) = scaled_delta_mid;
+    opt_result = mid_result;
+    if( mid_result > 1e-7 ){
+        if( min_result < opt_result ){
+            (*t_delta) = scaled_delta_min;
+            tSearch(function, delta, t_delta, x, t_min, t_mid, true_result);
+        } else if ( max_result < opt_result ){
+            (*t_delta) = scaled_delta_max;
+            tSearch(function, delta, t_delta, x, t_mid, t_max, true_result);
+        }
+    }
+    
 }

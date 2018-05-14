@@ -3,7 +3,6 @@
 #include "utility_functions.hpp"
 #include "fullSolver.hpp"
 
-void generic_nonlinear_function ( double time , vector<double>* input , vector<double>* output );
 
 namespace secantMinimization
 {
@@ -26,7 +25,7 @@ namespace quasiNewtonMinimization
 {
 	void quasiNewton_delta( void (*function)( double , vector<double>* , vector<double>* ) ,
 	double time , vector<double> initial_guess_1 , double pert , 
-	vector<double>* parameter_solutions , vector<double>* performance_metrics , bool normalize = 0);
+	vector<double>* parameter_solutions , vector<double>* performance_metrics , vector<double>* desired_result , bool normalize = 0);
 
 	void gradient_calculation( vector<double>* current_parameters , double pert ,
 	vector<double>* current_output , vector<double>*perturbed_output , vector<double>* gradients );
@@ -36,6 +35,8 @@ namespace quasiNewtonMinimization
 	vector<vector<double>>* hessians );
 
 }
+
+void tSearch( void (*function)( double , vector<double>* , vector<double>* ), vector<double>* delta, vector<double>* t_delta, vector<double>* x, double t_min, double t_max, vector<double>* true_result);
 
 void generic_nonlinear_function ( double time , vector<double>* input , vector<double>* output );
 void exponential_function( double time , vector<double>* input , vector<double>* output );
