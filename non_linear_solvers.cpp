@@ -37,11 +37,6 @@ void secantMinimization::secant_delta( void (*function)( double , vector<double>
 
 	// do a line search
 
-	// // update the parameters
-	// scaleVector( -1.0 , &deltas , &deltas_n );
-	// vector<double> current_params;
-	// addVectors( &initial_guess_3 , &deltas_n , &current_params );
-
 	int counter = 0;
 	double relative_residual = 1.0 ;
 	double absolute_residual;
@@ -65,11 +60,12 @@ void secantMinimization::secant_delta( void (*function)( double , vector<double>
 		addVectors( &initial_guess_2 , &deltas_n , &initial_guess_3 );
 		function( time , &initial_guess_3 , &output_3 );
 
-		//
+		// erase data for next iteration
 		gradients.erase(gradients.begin(), gradients.end());
 		hessians.erase(hessians.begin(), hessians.end());
 		deltas.erase(deltas.begin(), deltas.end());
 
+		// calculate next update iteration
 		gradient_calculation( &initial_guess_3 , &initial_guess_2 , &output_3 , &output_2 , &gradients );
 		hessian_calculation( &initial_guess_3 , &initial_guess_2 , &initial_guess_1 , 
 			&output_3 , &output_2 , &output_1 , &hessians );
@@ -78,13 +74,14 @@ void secantMinimization::secant_delta( void (*function)( double , vector<double>
 
 		absolute_residual = 0.0;
 		relative_residual = 0.0;
+		// cout << "size of delta : " << deltas.size() << endl;
 		for ( int i = 0 ; i < deltas.size() ; i++ ){
 			absolute_residual += deltas[i]*deltas[i];
 			relative_residual += (deltas[i]*deltas[i]) / (initial_guess_3[i] * initial_guess_3[i]);
 		}
 
 		counter++;
-		//if ( counter > 5000 ) break;
+		if ( counter > 50000 ) break;
 	}
 
 	(*parameter_solutions) = initial_guess_3;

@@ -17,6 +17,7 @@ int main(int argc, const char * argv[]) {
     
     void (*function)( double , vector<double>* , vector<double>* ) = generic_polynomial_function;
     void (*exp_func)( double , vector<double>* , vector<double>* ) = exponential_function;
+    void (*nol_func)( double , vector<double>* , vector<double>* ) = generic_nonlinear_function;
     
     vector<double> input , gradient , error;
     
@@ -62,8 +63,8 @@ int main(int argc, const char * argv[]) {
     test_secant_hessian();
 
     vector<double> initial_guess_1 , initial_guess_2 , parameter_solutions , perfomance_metrics;
-    initial_guess_1.push_back(1.1);
-    initial_guess_2.push_back(1.0);
+    initial_guess_1.push_back(1.0);
+    initial_guess_2.push_back(0.9);
     secantMinimization::secant_delta( exp_func , 0.0 , initial_guess_1 , initial_guess_2 , 
         &parameter_solutions , &perfomance_metrics );
 
@@ -71,6 +72,21 @@ int main(int argc, const char * argv[]) {
     printVector( &parameter_solutions );
     cout << " perfomance_metrics : " ;
     printVector( &perfomance_metrics );
+
+
+    vector<double> initial_guess_1b , initial_guess_2b , parameter_solutions_b , perfomance_metrics_b;
+    initial_guess_1b.push_back(1.0);
+    initial_guess_1b.push_back(1.0);
+    initial_guess_2b.push_back(2.0);
+    initial_guess_2b.push_back(3.0);
+
+    secantMinimization::secant_delta( nol_func , 0.0 , initial_guess_1b , initial_guess_2b , 
+        &parameter_solutions_b , &perfomance_metrics_b );
+
+    cout << " testing secant delta function : " ; 
+    printVector( &parameter_solutions_b );
+    cout << " perfomance_metrics : " ;
+    printVector( &perfomance_metrics_b );
 
 
     return 0;
